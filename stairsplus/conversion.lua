@@ -1,50 +1,49 @@
 -- Function to convert all stairs/slabs/etc nodes from
 -- inverted, wall, etc to regular + 6d facedir
 
-local dirs1 = { 21, 20, 23, 22, 21 }
-local dirs2 = { 15, 8, 17, 6, 15 }
-local dirs3 = { 14, 11, 16, 5, 14 }
+local dirs1 = {21, 20, 23, 22, 21}
+local dirs2 = {15, 8, 17, 6, 15}
+local dirs3 = {14, 11, 16, 5, 14}
 
-function register_6dfacedir_conversion(modname, material)
+function stairsplus:register_6dfacedir_conversion(modname, material)
 	--print("Register stairsplus 6d facedir conversion")
 	--print('ABM for '..modname..' "'..material..'"')
 
 	local objects_list1 = {
-		modname..":slab_" .. material .. "_inverted",
-		modname..":slab_" .. material .. "_quarter_inverted",
-		modname..":slab_" .. material .. "_three_quarter_inverted",
-		modname..":stair_" .. material .. "_inverted",
-		modname..":stair_" .. material .. "_wall",
-		modname..":stair_" .. material .. "_wall_half",
-		modname..":stair_" .. material .. "_wall_half_inverted",
-		modname..":stair_" .. material .. "_half_inverted",
-		modname..":stair_" .. material .. "_right_half_inverted",
-		modname..":panel_" .. material .. "_vertical",
-		modname..":panel_" .. material .. "_top",
+		modname..":slab_"..material.."_inverted",
+		modname..":slab_"..material.."_quarter_inverted",
+		modname..":slab_"..material.."_three_quarter_inverted",
+		modname..":stair_"..material.."_inverted",
+		modname..":stair_"..material.."_wall",
+		modname..":stair_"..material.."_wall_half",
+		modname..":stair_"..material.."_wall_half_inverted",
+		modname..":stair_"..material.."_half_inverted",
+		modname..":stair_"..material.."_right_half_inverted",
+		modname..":panel_"..material.."_vertical",
+		modname..":panel_"..material.."_top",
 	}
 
 	local objects_list2 = {
-		modname..":slab_" .. material .. "_wall",
-		modname..":slab_" .. material .. "_quarter_wall",
-		modname..":slab_" .. material .. "_three_quarter_wall",
-		modname..":stair_" .. material .. "_inner_inverted",
-		modname..":stair_" .. material .. "_outer_inverted",
-		modname..":micro_" .. material .. "_top"
+		modname..":slab_"..material.."_wall",
+		modname..":slab_"..material.."_quarter_wall",
+		modname..":slab_"..material.."_three_quarter_wall",
+		modname..":stair_"..material.."_inner_inverted",
+		modname..":stair_"..material.."_outer_inverted",
+		modname..":micro_"..material.."_top"
 	}
 
-	for j in ipairs(objects_list1) do
+	for _, object in pairs(objects_list1) do
 		local flip_upside_down = false
 		local flip_to_wall = false
 
-		local object = objects_list1[j]
-		local dest_object = objects_list1[j]
+		local dest_object = object
 
 		if string.find(dest_object, "_inverted") then
 			flip_upside_down = true
 			dest_object = string.gsub(dest_object, "_inverted", "")
 		end
 
-		if string.find(dest_object, "_top") then
+		if string.find(object, "_top") then
 			flip_upside_down = true
 			dest_object = string.gsub(dest_object, "_top", "")
 		end
@@ -69,30 +68,29 @@ function register_6dfacedir_conversion(modname, material)
 		--print("    |     to "..dest_object)
 
 		minetest.register_abm({
-			nodenames = { object },
+			nodenames = {object},
 			interval = 1,
 			chance = 1,
 			action = function(pos, node, active_object_count, active_object_count_wider)
 				local fdir = node.param2 or 0
 
 				if flip_upside_down and not flip_to_wall then 
-					nfdir = dirs1[fdir+2]
+					nfdir = dirs1[fdir + 2]
 				elseif flip_to_wall and not flip_upside_down then
-					nfdir = dirs2[fdir+1]
+					nfdir = dirs2[fdir + 1]
 				elseif flip_to_wall and flip_upside_down then
-					nfdir = dirs3[fdir+2]
+					nfdir = dirs3[fdir + 2]
 				end
-				minetest.env:add_node(pos, {name = dest_object, param2 = nfdir})
+				minetest.set_node(pos, {name = dest_object, param2 = nfdir})
 			end
 		})
 	end
 
-	for j in ipairs(objects_list2) do
+	for _, object in pairs(objects_list2) do
 		local flip_upside_down = false
 		local flip_to_wall = false
 
-		local object = objects_list2[j]
-		local dest_object = objects_list2[j]
+		local dest_object = object
 
 		if string.find(dest_object, "_inverted") then
 			flip_upside_down = true
@@ -113,7 +111,7 @@ function register_6dfacedir_conversion(modname, material)
 		--print("    |     to "..dest_object)
 
 		minetest.register_abm({
-			nodenames = { object },
+			nodenames = {object},
 			interval = 1,
 			chance = 1,
 			action = function(pos, node, active_object_count, active_object_count_wider)
@@ -121,13 +119,14 @@ function register_6dfacedir_conversion(modname, material)
 				local nfdir = 20
 
 				if flip_upside_down and not flip_to_wall then 
-					nfdir = dirs1[fdir+1]
+					nfdir = dirs1[fdir + 1]
 				elseif flip_to_wall and not flip_upside_down then
-					nfdir = dirs2[fdir+2]
+					nfdir = dirs2[fdir + 2]
 
 				end
-				minetest.env:add_node(pos, {name = dest_object, param2 = nfdir})
+				minetest.set_node(pos, {name = dest_object, param2 = nfdir})
 			end
 		})
 	end
 end
+
